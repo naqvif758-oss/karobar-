@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Business</title>
+<meta name="theme-color" content="#5C2222">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Business">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --paper:#F6EFE2;
+    --paper-line:#D9C9A8;
+    --ink:#2B2117;
+    --ink-soft:#6B5B45;
+    --maroon:#7A2E2E;
+    --maroon-dark:#5C2222;
+    --green:#3D6B4F;
+    --gold:#B8893E;
+    --card:#FFFBF3;
+    --f-display: Georgia, 'Times New Roman', serif;
+    --f-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    --f-urdu: 'Geeza Pro', 'Jameel Noori Nastaleeq', Tahoma, var(--f-body);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--paper-line) 28px);
+    font-family:var(--f-body);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:90px;
+  }
+  header{
+    padding:22px 20px 14px;
+    text-align:center;
+    border-bottom:2px solid var(--maroon);
+    background:linear-gradient(180deg, rgba(246,239,226,1) 0%, rgba(246,239,226,0.4) 100%);
+  }
+  header h1{
+    font-family:var(--f-urdu);
+    font-size:34px;
+    margin:0;
+    color:var(--maroon-dark);
+    line-height:1.4;
+  }
+  header p{
+    margin:4px 0 0;
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+
+  .summary-strip{
+    display:flex;
+    overflow-x:auto;
+    gap:10px;
+    padding:14px 16px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .sum-card{
+    flex:0 0 auto;
+    min-width:128px;
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-left:4px solid var(--gold);
+    border-radius:6px;
+    padding:10px 12px;
+  }
+  .sum-card.green{border-left-color:var(--green);}
+  .sum-card.maroon{border-left-color:var(--maroon);}
+  .sum-card .label{font-size:10px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px;}
+  .sum-card .val{font-family:var(--f-display);font-size:20px;color:var(--ink);margin-top:2px;}
+
+  main{padding:6px 16px 16px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .section-title{
+    font-family:var(--f-display);
+    font-size:20px;
+    color:var(--maroon-dark);
+    margin:14px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-title::after{content:"";flex:1;height:1px;background:var(--paper-line);}
+
+  .entry-card{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    border-radius:8px;
+    padding:12px 14px;
+    margin-bottom:10px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.04);
+  }
+  .entry-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .entry-title{font-weight:600;font-size:15px;}
+  .entry-date{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+  .entry-amt{font-family:var(--f-display);font-size:18px;white-space:nowrap;}
+  .entry-amt.pos{color:var(--green);}
+  .entry-amt.neg{color:var(--maroon);}
+  .entry-sub{font-size:12px;color:var(--ink-soft);margin-top:6px;}
+  .del-btn{
+    background:none;border:none;color:var(--ink-soft);font-size:16px;cursor:pointer;padding:2px 6px;
+  }
+  .empty{
+    text-align:center;color:var(--ink-soft);font-size:13px;padding:30px 10px;
+  }
+
+  .fab{
+    position:fixed;
+    right:18px;
+    bottom:86px;
+    width:54px;height:54px;
+    border-radius:50%;
+    background:var(--maroon);
+    color:#fff;
+    border:none;
+    font-size:28px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    cursor:pointer;
+    z-index:40;
+  }
+
+  nav.tabbar{
+    position:fixed;
+    bottom:0;left:0;right:0;
+    background:var(--maroon-dark);
+    display:flex;
+    z-index:20;
+    border-top:2px solid var(--gold);
+  }
+  nav.tabbar button{
+    flex:1;
+    background:none;
+    border:none;
+    color:#E8D9BE;
+    font-size:11px;
+    padding:9px 2px 8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:3px;
+    cursor:pointer;
+    font-family:var(--f-body);
+  }
+  nav.tabbar button .ic{font-size:18px;}
+  nav.tabbar button.active{color:#fff;background:rgba(255,255,255,0.08);}
+
+  .modal-bg{
+    position:fixed;inset:0;background:rgba(43,33,23,0.55);
+    display:none;align-items:flex-end;justify-content:center;z-index:50;
+  }
+  .modal-bg.show{display:flex;}
+  .modal{
+    background:var(--paper);
+    width:100%;max-width:480px;
+    border-radius:16px 16px 0 0;
+    padding:18px 18px 22px;
+    max-height:88vh;overflow-y:auto;
+  }
+  .modal h3{
+    font-family:var(--f-display);color:var(--maroon-dark);margin:0 0 14px;font-size:20px;
+  }
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:4px;}
+  .field input, .field select, .field textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--paper-line);border-radius:7px;
+    background:#fff;font-size:14px;font-family:var(--f-body);color:var(--ink);
+  }
+  .row2{display:flex;gap:10px;}
+  .row2 .field{flex:1;}
+  .modal-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn{
+    flex:1;padding:12px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .btn.primary{background:var(--maroon);color:#fff;}
+  .btn.secondary{background:#fff;color:var(--ink-soft);border:1px solid var(--paper-line);}
+
+  .loading{text-align:center;padding:40px;color:var(--ink-soft);}
+  .toast{
+    position:fixed;top:14px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;
+    z-index:100;opacity:0;transition:opacity .25s;pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Business</h1>
+  <p>Mera Khata · Karobar Tracker</p>
+</header>
+
+<div class="summary-strip" id="summaryStrip"></div>
+
+<main>
+  <div class="panel active" id="panel-summary">
+    <div class="section-title">Aaj ka Khulasa</div>
+    <div id="summaryDetail"></div>
+  </div>
+
+  <div class="panel" id="panel-sales">
+    <div class="section-title">Sales</div>
+    <div id="list-sales"></div>
+  </div>
+
+  <div class="panel" id="panel-expenses">
+    <div class="section-title">Kharch</div>
+    <div id="list-expenses"></div>
+  </div>
+
+  <div class="panel" id="panel-udhaar">
+    <div class="section-title">Udhaar (Customers)</div>
+    <div id="list-udhaar"></div>
+  </div>
+
+  <div class="panel" id="panel-stock">
+    <div class="section-title">Stock</div>
+    <div id="list-stock"></div>
+  </div>
+</main>
+
+<button class="fab" id="fabBtn">+</button>
+
+<nav class="tabbar">
+  <button data-tab="summary" class="active"><span class="ic">🏠</span>Khulasa</button>
+  <button data-tab="sales"><span class="ic">💰</span>Sales</button>
+  <button data-tab="expenses"><span class="ic">🧾</span>Kharch</button>
+  <button data-tab="udhaar"><span class="ic">🤝</span>Udhaar</button>
+  <button data-tab="stock"><span class="ic">📦</span>Stock</button>
+</nav>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Naya Entry</h3>
+    <div id="modalFields"></div>
+    <div class="modal-actions">
+      <button class="btn secondary" id="cancelBtn">Cancel</button>
+      <button class="btn primary" id="saveBtn">Save Karein</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA = { sales: [], expenses: [], udhaar: [], stock: [] };
+let currentTab = 'summary';
+let editingId = null;
+const toastEl = document.getElementById('toast');
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(()=>toastEl.classList.remove('show'), 1800);
+}
+
+function fmt(n){
+  n = Number(n)||0;
+  return n.toLocaleString('en-PK');
+}
+function todayStr(){
+  return new Date().toISOString().slice(0,10);
+}
+function uid(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+
+async function loadData(){
+  try{
+    const raw = localStorage.getItem('khata-data');
+    if(raw){
+      DATA = JSON.parse(raw);
+      DATA.sales = DATA.sales || [];
+      DATA.expenses = DATA.expenses || [];
+      DATA.udhaar = DATA.udhaar || [];
+      DATA.stock = DATA.stock || [];
+      DATA.sales.forEach(e=>{ if(e.realprice===undefined && e.total!==undefined){ e.realprice = e.total; e.discount = 0; e.cost = 0; } });
+    }
+  }catch(e){
+    console.log('no existing data yet');
+  }
+  renderAll();
+}
+
+async function saveData(){
+  try{
+    localStorage.setItem('khata-data', JSON.stringify(DATA));
+  }catch(e){
+    showToast('Save mein masla hua, dobara koshish karein');
+  }
+}
+
+function switchTab(tab){
+  currentTab = tab;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+tab).classList.add('active');
+  document.querySelectorAll('nav.tabbar button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===tab);
+  });
+}
+
+document.querySelectorAll('nav.tabbar button').forEach(b=>{
+  b.addEventListener('click', ()=>switchTab(b.dataset.tab));
+});
+
+function renderAll(){
+  renderSummary();
+  renderSales();
+  renderExpenses();
+  renderUdhaar();
+  renderStock();
+}
+
+function renderSummary(){
+  const totalRealPrice = DATA.sales.reduce((s,e)=>s+Number(e.realprice||0),0);
+  const totalDiscount = DATA.sales.reduce((s,e)=>s+(Number(e.realprice||0)*Number(e.discount||0)/100),0);
+  const totalSales = DATA.sales.reduce((s,e)=>s+(Number(e.realprice||0)-(Number(e.realprice||0)*Number(e.discount||0)/100)),0);
+  const totalReceived = DATA.sales.reduce((s,e)=>s+Number(e.paid||0),0);
+  const totalCost = DATA.sales.reduce((s,e)=>s+Number(e.cost||0),0);
+  const salesProfit = totalSales - totalCost;
+  const totalExpenses = DATA.expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  const udhaarBaqaya = DATA.udhaar.reduce((s,e)=>s+(Number(e.given||0)-Number(e.received||0)),0);
+  const stockValue = DATA.stock.reduce((s,e)=>s+(Number(e.qty||0)*Number(e.rate||0)),0);
+  const netProfit = salesProfit - totalExpenses;
+
+  document.getElementById('summaryStrip').innerHTML = `
+    <div class="sum-card green"><div class="label">Total Sales</div><div class="val">₨${fmt(totalSales)}</div></div>
+    <div class="sum-card"><div class="label">Total Discount</div><div class="val">₨${fmt(totalDiscount)}</div></div>
+    <div class="sum-card green"><div class="label">Sales Profit</div><div class="val">₨${fmt(salesProfit)}</div></div>
+    <div class="sum-card maroon"><div class="label">Kharch</div><div class="val">₨${fmt(totalExpenses)}</div></div>
+    <div class="sum-card"><div class="label">Udhaar Baqaya</div><div class="val">₨${fmt(udhaarBaqaya)}</div></div>
+    <div class="sum-card green"><div class="label">Stock Value</div><div class="val">₨${fmt(stockValue)}</div></div>
+  `;
+
+  document.getElementById('summaryDetail').innerHTML = `
+    <div class="entry-card">
+      <div class="entry-top"><div class="entry-title">Net Profit (Sales − Cost − Kharch)</div>
+      <div class="entry-amt ${netProfit>=0?'pos':'neg'}">₨${fmt(netProfit)} ${totalSales>0?`(${((netProfit/totalSales)*100).toFixed(1)}%)`:''}</div></div>
+      <div class="entry-sub">Asal Qeemat: ₨${fmt(totalRealPrice)} · Discount: ₨${fmt(totalDiscount)} · Lagat: ₨${fmt(totalCost)}</div>
+    </div>
+    <div class="entry-card">
+      <div class="entry-top"><div class="entry-title">Wasooli vs Kharch</div>
+      <div class="entry-amt ${ (totalReceived-totalExpenses)>=0?'pos':'neg'}">₨${fmt(totalReceived-totalExpenses)}</div></div>
+      <div class="entry-sub">Wasool hua: ₨${fmt(totalReceived)} · Kharch: ₨${fmt(totalExpenses)}</div>
+    </div>
+    <div class="entry-card">
+      <div class="entry-top"><div class="entry-title">Customers se Baqaya Lena Hai</div>
+      <div class="entry-amt neg">₨${fmt(udhaarBaqaya)}</div></div>
+      <div class="entry-sub">${DATA.udhaar.length} udhaar entries</div>
+    </div>
+    <div class="entry-card">
+      <div class="entry-top"><div class="entry-title">Stock mein Maal</div>
+      <div class="entry-amt pos">₨${fmt(stockValue)}</div></div>
+      <div class="entry-sub">${DATA.stock.length} items</div>
+    </div>
+  `;
+}
+
+function listOrEmpty(container, items, msg){
+  if(items.length===0){
+    container.innerHTML = `<div class="empty">${msg}</div>`;
+    return true;
+  }
+  return false;
+}
+
+function renderSales(){
+  const c = document.getElementById('list-sales');
+  if(listOrEmpty(c, DATA.sales, 'Abhi koi sale add nahi hui. + dabayein.')) return;
+  c.innerHTML = [...DATA.sales].reverse().map(e=>{
+    const real = Number(e.realprice||0);
+    const discPct = Number(e.discount||0);
+    const discAmt = real * discPct / 100;
+    const saleAmt = real - discAmt;
+    const cost = Number(e.cost||0);
+    const profit = saleAmt - cost;
+    const bal = saleAmt - Number(e.paid||0);
+    return `<div class="entry-card" onclick="editEntry('sales','${e.id}')">
+      <div class="entry-top">
+        <div><div class="entry-title">${e.customer}</div><div class="entry-date">${e.date} · ${e.item||''}</div></div>
+        <div style="text-align:right">
+          <div class="entry-amt pos">₨${fmt(saleAmt)}</div>
+          <button class="del-btn" onclick="event.stopPropagation();deleteEntry('sales','${e.id}')">✕</button>
+        </div>
+      </div>
+      <div class="entry-sub">Asal Qeemat: ₨${fmt(real)} · Discount: ${discPct}% (₨${fmt(discAmt)}) · Profit: <span style="color:${profit>=0?'var(--green)':'var(--maroon)'};font-weight:600">₨${fmt(profit)} (${cost>0?((profit/cost)*100).toFixed(1):(saleAmt>0?100:0)}%)</span></div>
+      <div class="entry-sub">Mila: ₨${fmt(e.paid)} ${bal>0?`· Baqaya: ₨${fmt(bal)}`:'· Pura wasool'}</div>
+      ${e.note?`<div class="entry-sub" style="font-style:italic">📝 ${e.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderExpenses(){
+  const c = document.getElementById('list-expenses');
+  if(listOrEmpty(c, DATA.expenses, 'Abhi koi kharch darj nahi. + dabayein.')) return;
+  c.innerHTML = [...DATA.expenses].reverse().map(e=>`
+    <div class="entry-card" onclick="editEntry('expenses','${e.id}')">
+      <div class="entry-top">
+        <div><div class="entry-title">${e.type}</div><div class="entry-date">${e.date} ${e.desc?'· '+e.desc:''}</div></div>
+        <div style="text-align:right">
+          <div class="entry-amt neg">₨${fmt(e.amount)}</div>
+          <button class="del-btn" onclick="event.stopPropagation();deleteEntry('expenses','${e.id}')">✕</button>
+        </div>
+      </div>
+      ${e.note?`<div class="entry-sub" style="font-style:italic">📝 ${e.note}</div>`:''}
+    </div>`).join('');
+}
+
+function renderUdhaar(){
+  const c = document.getElementById('list-udhaar');
+  if(listOrEmpty(c, DATA.udhaar, 'Koi udhaar record nahi. + dabayein.')) return;
+  c.innerHTML = [...DATA.udhaar].reverse().map(e=>{
+    const bal = Number(e.given||0)-Number(e.received||0);
+    return `<div class="entry-card" onclick="editEntry('udhaar','${e.id}')">
+      <div class="entry-top">
+        <div><div class="entry-title">${e.customer}</div><div class="entry-date">${e.date} ${e.phone?'· '+e.phone:''}</div></div>
+        <div style="text-align:right">
+          <div class="entry-amt ${bal>0?'neg':'pos'}">₨${fmt(bal)}</div>
+          <button class="del-btn" onclick="event.stopPropagation();deleteEntry('udhaar','${e.id}')">✕</button>
+        </div>
+      </div>
+      <div class="entry-sub">Diya: ₨${fmt(e.given)} · Wapis Mila: ₨${fmt(e.received)}</div>
+      ${e.note?`<div class="entry-sub" style="font-style:italic">📝 ${e.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderStock(){
+  const c = document.getElementById('list-stock');
+  if(listOrEmpty(c, DATA.stock, 'Stock mein koi item nahi. + dabayein.')) return;
+  c.innerHTML = [...DATA.stock].reverse().map(e=>{
+    const val = Number(e.qty||0)*Number(e.rate||0);
+    return `<div class="entry-card" onclick="editEntry('stock','${e.id}')">
+      <div class="entry-top">
+        <div><div class="entry-title">${e.name}</div><div class="entry-date">Qty: ${e.qty}</div></div>
+        <div style="text-align:right">
+          <div class="entry-amt pos">₨${fmt(val)}</div>
+          <button class="del-btn" onclick="event.stopPropagation();deleteEntry('stock','${e.id}')">✕</button>
+        </div>
+      </div>
+      <div class="entry-sub">Rate: ₨${fmt(e.rate)} per unit</div>
+      ${e.note?`<div class="entry-sub" style="font-style:italic">📝 ${e.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function deleteEntry(cat, id){
+  DATA[cat] = DATA[cat].filter(e=>e.id!==id);
+  await saveData();
+  renderAll();
+  showToast('Entry hata di gayi');
+}
+
+// ----- Modal / Add Entry -----
+const modalBg = document.getElementById('modalBg');
+const modalFields = document.getElementById('modalFields');
+const modalTitle = document.getElementById('modalTitle');
+
+const formDefs = {
+  sales: {
+    title: 'Nayi Sale',
+    fields: [
+      {key:'customer', label:'Customer Naam', type:'text', required:true},
+      {key:'item', label:'Item / Service', type:'text'},
+      {key:'date', label:'Tareekh', type:'date', default:todayStr()},
+      {key:'realprice', label:'Asal Qeemat / MRP (₨)', type:'number', required:true},
+      {key:'discount', label:'Discount (%)', type:'number', default:0},
+      {key:'cost', label:'Lagat / Cost Price (₨)', type:'number', default:0},
+      {key:'paid', label:'Mila Hua Amount (₨)', type:'number', default:0},
+      {key:'note', label:'Detail / Note (jo yaad rakhna hai)', type:'text'},
+    ]
+  },
+  expenses: {
+    title:'Naya Kharch',
+    fields:[
+      {key:'type', label:'Kharch Type (e.g. Rent, Bijli)', type:'text', required:true},
+      {key:'desc', label:'Tafseel (optional)', type:'text'},
+      {key:'date', label:'Tareekh', type:'date', default:todayStr()},
+      {key:'amount', label:'Amount (₨)', type:'number', required:true},
+      {key:'note', label:'Detail / Note (jo yaad rakhna hai)', type:'text'},
+    ]
+  },
+  udhaar:{
+    title:'Naya Udhaar',
+    fields:[
+      {key:'customer', label:'Customer Naam', type:'text', required:true},
+      {key:'phone', label:'Phone (optional)', type:'text'},
+      {key:'date', label:'Tareekh', type:'date', default:todayStr()},
+      {key:'given', label:'Udhaar Diya (₨)', type:'number', default:0},
+      {key:'received', label:'Wapis Mila (₨)', type:'number', default:0},
+      {key:'note', label:'Detail / Note (jo yaad rakhna hai)', type:'text'},
+    ]
+  },
+  stock:{
+    title:'Naya Stock Item',
+    fields:[
+      {key:'name', label:'Item Naam', type:'text', required:true},
+      {key:'qty', label:'Quantity', type:'number', required:true},
+      {key:'rate', label:'Rate per Unit (₨)', type:'number', required:true},
+      {key:'note', label:'Detail / Note (jo yaad rakhna hai)', type:'text'},
+    ]
+  }
+};
+
+function openModal(prefill){
+  const def = formDefs[currentTab];
+  if(!def){ showToast('Khulasa tab pe entry add nahi hoti, koi aur tab chunein'); return; }
+  modalTitle.textContent = editingId ? 'Entry Tabdeel Karein' : def.title;
+  modalFields.innerHTML = def.fields.map(f=>{
+    const v = prefill ? prefill[f.key] : (f.default!==undefined?f.default:'');
+    if(f.key==='note'){
+      return `<div class="field">
+        <label>${f.label}</label>
+        <textarea id="f_${f.key}" rows="3">${v!==undefined?v:''}</textarea>
+      </div>`;
+    }
+    return `<div class="field">
+      <label>${f.label}</label>
+      <input type="${f.type}" id="f_${f.key}" value="${v!==undefined?v:''}">
+    </div>`;
+  }).join('');
+  document.getElementById('saveBtn').textContent = editingId ? 'Update Karein' : 'Save Karein';
+  modalBg.classList.add('show');
+}
+
+function closeModal(){
+  modalBg.classList.remove('show');
+  editingId = null;
+}
+
+function editEntry(cat, id){
+  if(cat !== currentTab) switchTab(cat);
+  const entry = DATA[cat].find(e=>e.id===id);
+  if(!entry) return;
+  editingId = id;
+  openModal(entry);
+}
+
+document.getElementById('fabBtn').addEventListener('click', ()=>{
+  editingId = null;
+  openModal(null);
+});
+
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+modalBg.addEventListener('click', (ev)=>{ if(ev.target===modalBg) closeModal(); });
+
+document.getElementById('saveBtn').addEventListener('click', async ()=>{
+  const def = formDefs[currentTab];
+  if(!def) return;
+  const obj = {};
+  let missingRequired = false;
+  def.fields.forEach(f=>{
+    const el = document.getElementById('f_'+f.key);
+    let val = el ? el.value : '';
+    if(f.required && (val===undefined || val==='')) missingRequired = true;
+    if(f.type==='number') val = val===''?0:Number(val);
+    obj[f.key] = val;
+  });
+  if(missingRequired){
+    showToast('Zaroori fields bharein');
+    return;
+  }
+  if(editingId){
+    const idx = DATA[currentTab].findIndex(e=>e.id===editingId);
+    if(idx>-1){
+      obj.id = editingId;
+      DATA[currentTab][idx] = obj;
+    }
+    showToast('Entry update ho gayi');
+  } else {
+    obj.id = uid();
+    DATA[currentTab].push(obj);
+    showToast('Entry save ho gayi');
+  }
+  await saveData();
+  renderAll();
+  closeModal();
+});
+
+loadData();
+</script>
+</body>
+</html>
+,!
