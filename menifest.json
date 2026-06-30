@@ -1,0 +1,22 @@
+{
+  "name": "Business - Mera Khata",
+  "short_name": "Business",
+  "description": "Karobar Tracker - Sales, Kharch, Udhaar, Stock",
+  "start_url": "./business.html",
+  "display": "standalone",
+  "background_color": "#F6EFE2",
+  "theme_color": "#5C2222",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
